@@ -119,7 +119,7 @@ func Request(method string, path string, params map[string]string) string {
 }
 
 func main() {
-	var get GetFunc
+	var get CoinBase
 	get.coin = "TETH"
 	get.address = "0xced5c00ccf7ff9784e11f15206c6b841fe528ad5"
 	get.side = "deposit"
@@ -146,7 +146,7 @@ func main() {
 
 	//fmt.Println(get.pendingDepositDetails())
 
-	//fmt.Println(get.withdrawalInformation())
+	fmt.Println(get.withdrawalInformation("123"))
 
 	/*res := Request("GET", "/v1/custody/transaction_history/", map[string]string{
 		"coin": "TETH",

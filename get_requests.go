@@ -1,18 +1,18 @@
 package main
 
-type GetFunc struct {
+type CoinBase struct {
 	coin    string
 	address string
 	side string
 }
 
-func (g *GetFunc) accountDetails() string {
+func (g *CoinBase) accountDetails() string {
 	res := Request("GET", "/v1/custody/org_info/", map[string]string{})
 
 	return res
 }
 
-func (g *GetFunc) coinDetails() string {
+func (g *CoinBase) coinDetails() string {
 	res := Request("GET", "/v1/custody/coin_info/", map[string]string{
 		"coin": g.coin,
 	})
@@ -20,7 +20,7 @@ func (g *GetFunc) coinDetails() string {
 	return res
 }
 
-func (g *GetFunc) verifyDeopsitAddress() string {
+func (g *CoinBase) verifyDeopsitAddress() string {
 	res := Request("GET", "/v1/custody/address_info/", map[string]string{
 		"coin":    g.coin,
 		"address": g.address,
@@ -29,51 +29,51 @@ func (g *GetFunc) verifyDeopsitAddress() string {
 	return res
 }
 
-func (g *GetFunc) verifyValidAddress() string {
+func (g *CoinBase) verifyValidAddress() string {
 	return Request("GET", "/v1/custody/is_valid_address/", map[string]string{
 		"coin": g.coin,
 		"address": g.address,
 	})
 }
 
-func (g *GetFunc) addressHistList() string {
+func (g *CoinBase) addressHistList() string {
 	return Request("GET", "/v1/custody/address_history/", map[string]string{
 		"coin": g.coin,
 	})
 }
 
-func (g *GetFunc) loopAddressDetails() string {
+func (g *CoinBase) loopAddressDetails() string {
 	return Request("GET", "/v1/custody/internal_address_info/", map[string]string{
 		"coin": g.coin,
 		"address": g.address,
 	})
 }
 
-func (g *GetFunc) transDetails() {
+func (g *CoinBase) transDetails() {
 	return
 }
 
-func (g *GetFunc) transHistory() string {
+func (g *CoinBase) transHistory() string {
 	return Request("GET", "/v1/custody/transaction_history/", map[string]string{
 		"coin": g.coin,
 		"side": g.side,
 	})
 }
 
-func (g *GetFunc) pendingTransaction() string {
+func (g *CoinBase) pendingTransaction() string {
 	return Request("GET", "/v1/custody/pending_transactions/", map[string]string{
 		"coin": g.coin,
 		"side": g.side,
 	})
 }
 
-func (g *GetFunc) pendingDepositDetails(id string) string {
+func (g *CoinBase) pendingDepositDetails(id string) string {
 	return Request("GET", "/v1/custody/deposit_info/", map[string]string{
 		"id": id,
 	})
 }
 
-func (g *GetFunc) withdrawalInformation(reqId string) string {
+func (g *CoinBase) withdrawalInformation(reqId string) string {
 	return Request("GET", "/v1/custody/withdraw_info_by_request_id/", map[string]string{
 		"request_id": reqId,
 	})
