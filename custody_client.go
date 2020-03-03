@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 )
 import "time"
@@ -17,8 +18,10 @@ import "github.com/btcsuite/btcd/btcec"
 import "net/http"
 
 const HOST = "https://api.sandbox.cobo.com"
-const API_KEY = "02d9e82b388fe783d0667596dca16e0cbf75f48071f5d610367d94f0d8583b3b0d"
-const API_SECRET = "8143a7d49eeebb2822980641429feac5a14ff1ddde22bb99aa67fec08b24e2f8"
+//const API_KEY = "02d9e82b388fe783d0667596dca16e0cbf75f48071f5d610367d94f0d8583b3b0d"
+const API_KEY = "03028cd5dad75c8434e19d94a5ef853f1088745dda9a701b763ef92582dce96df0"
+//const API_SECRET = "8143a7d49eeebb2822980641429feac5a14ff1ddde22bb99aa67fec08b24e2f8"
+const API_SECRET = "c4096a2326b97a9b6c7b690bc8b52f85fc30373282c0a685c15a346c3c8b8015"
 const SIG_TYPE = "ecdsa"
 
 func GenerateRandomKeyPair() {
@@ -112,7 +115,12 @@ func Request(method string, path string, params map[string]string) string {
 
 	resp, _ := client.Do(req)
 
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			fmt.Println("Close Err: ", err)
+		}
+	}()
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	return string(body)
@@ -146,17 +154,38 @@ func main() {
 
 	//fmt.Println(get.pendingDepositDetails())
 
-	fmt.Println(get.withdrawalInformation("123"))
+	//fmt.Println(get.withdrawalInformation("123"))
 
-	/*res := Request("GET", "/v1/custody/transaction_history/", map[string]string{
+	res := Request("GET", "/v1/custody/transaction_history/", map[string]string{
 		"coin": "TETH",
 		"side": "deposit",
+		"begin_time": "1579091977070",
 	})
-	fmt.Printf("res: %v", res)*/
+	fmt.Printf("res: %v", res)
+
+	var topUp TopUpHist
+	err := json.Unmarshal([]byte(res), &topUp)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println()
+	for i, _ := range topUp.Result {
+		fmt.Println("Number: ", i)
+		fmt.Println("Address: ", topUp.Result[i].Address)
+		fmt.Println("Source Addr: ", topUp.Result[i].Source_address)
+	}
+
+	fmt.Println("Results: ", len(topUp.Result))
+
+
+	//fmt.Println("Results: ", topUp.Result[0].Created_time)
 
 	/*res := Request("GET", "/v1/custody/address_info/", map[string]string{
 		"coin": "ETH",
 		"address": "0x544094588811118b7701cf4a9dea056e775b4b4e",
 	})
 	fmt.Printf("res: %v", res)*/
+
+	//GenerateRandomKeyPair()
 }
