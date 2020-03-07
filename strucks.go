@@ -44,11 +44,11 @@ type WithdrawResult struct {
 }
 
 type WithdrawInfo struct {
-	Success bool `json:"success"`
-	Result WithdrawInfoResult `json:"result"`
-	Error_code int `json:"error_code"`
-	Error_message string `json:"error_message"`
-	Error_description string `json:"error_description"`
+	Success           bool               `json:"success"`
+	Result            WithdrawInfoResult `json:"result"`
+	Error_code        int                `json:"error_code"`
+	Error_message     string             `json:"error_message"`
+	Error_description string             `json:"error_description"`
 }
 
 type WithdrawInfoResult struct {
@@ -63,8 +63,8 @@ type WithdrawInfoResult struct {
 	Decimal              int    `json:"decimal"`
 	Abs_amount           string `json:"abs_amount"`
 	Txid                 string `json:"txid"`
-	Vout_n               int64 `json:"vout_n"`
-	Resquest_id          string `json:"resquest_id"`
+	Vout_n               int64  `json:"vout_n"`
+	Request_id           string `json:"request_id"`
 	Status               string `json:"status"`
 	Created_time         int64  `json:"created_time"`
 	Last_time            int64  `json:"last_time"`
