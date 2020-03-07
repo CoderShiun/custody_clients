@@ -129,8 +129,9 @@ func Request(method string, path string, params map[string]string) string {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	a := VerifyEcc(string(body), resp.Header.Get("Biz_resp_signature"), resp.Header.Get("Biz-Timestamp"), "032f45930f652d72e0c90f71869dfe9af7d713b1f67dc2f7cb51f9572778b9c876")
-	fmt.Println(a)
+	if !VerifyEcc(string(body), resp.Header.Get("Biz_resp_signature"), resp.Header.Get("Biz-Timestamp"), "032f45930f652d72e0c90f71869dfe9af7d713b1f67dc2f7cb51f9572778b9c876") {
+		return "Verify failed"
+	}
 
 	return string(body)
 }
@@ -163,7 +164,7 @@ func main() {
 
 	//fmt.Println(get.verifyDeopsitAddress())
 
-	fmt.Println(get.verifyValidAddress())
+	//fmt.Println(get.verifyValidAddress())
 
 	//fmt.Println(get.addressHistList())
 
@@ -177,7 +178,18 @@ func main() {
 
 	//fmt.Println(get.pendingDepositDetails())
 
-	//fmt.Println(get.withdrawalInformation("123"))
+	res := get.withdrawalInformation("3")
+	var withdrawalInfo WithdrawInfo
+	err := json.Unmarshal([]byte(res), &withdrawalInfo)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(withdrawalInfo.Result.Amount)
+	fmt.Println(withdrawalInfo.Result.Status)
+	fmt.Println(withdrawalInfo.Error_message)
+
+	tm := time.Unix(1583620848763, 0)
+	fmt.Println(tm)
 
 	//fmt.Println(get.transDetails("20200115204400000323373000007145"))
 
@@ -217,7 +229,7 @@ func main() {
 	//GenerateRandomKeyPair()
 
 
-	res := post.submitWithdrawal("0xa1398b50E62Bf5512dd659198f1e225db7A8a41b","2500000000000000", "test9", time.Now().String())
+	/*res := post.submitWithdrawal("0xa1398b50E62Bf5512dd659198f1e225db7A8a41b","2500000000000000", "test9", time.Now().String())
 	fmt.Println(res)
 	var withdrawResult WithdrawResult
 	err := json.Unmarshal([]byte(res), &withdrawResult)
@@ -226,7 +238,7 @@ func main() {
 	}
 	fmt.Println(withdrawResult.Success)
 	fmt.Println(withdrawResult.ErrorCode)
-	fmt.Println(withdrawResult.ErrorMessage)
+	fmt.Println(withdrawResult.ErrorMessage)*/
 
 
 }
