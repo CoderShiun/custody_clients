@@ -18,10 +18,15 @@ import "github.com/btcsuite/btcd/btcec"
 import "net/http"
 
 const HOST = "https://api.sandbox.cobo.com"
-//const API_KEY = "02d9e82b388fe783d0667596dca16e0cbf75f48071f5d610367d94f0d8583b3b0d"
-const API_KEY = "03028cd5dad75c8434e19d94a5ef853f1088745dda9a701b763ef92582dce96df0"
-//const API_SECRET = "8143a7d49eeebb2822980641429feac5a14ff1ddde22bb99aa67fec08b24e2f8"
-const API_SECRET = "c4096a2326b97a9b6c7b690bc8b52f85fc30373282c0a685c15a346c3c8b8015"
+// Query Test
+//const API_KEY = "03028cd5dad75c8434e19d94a5ef853f1088745dda9a701b763ef92582dce96df0"
+//const API_SECRET = "c4096a2326b97a9b6c7b690bc8b52f85fc30373282c0a685c15a346c3c8b8015"
+
+// Withdrawal
+const API_KEY = "021d7ea6b0277ad20cb1c3638839ffefcf4eaee052dace2998f5ede063cf04b9e2"
+const API_SECRET = "1f3a73c1aedb99585c14b92693e9d91111a18fec84e9c396d6be9a1bd8404ef2"
+
+
 const SIG_TYPE = "ecdsa"
 
 func GenerateRandomKeyPair() {
@@ -78,14 +83,14 @@ func SignEcc(message string) string {
 	return fmt.Sprintf("%x", sig.Serialize())
 }
 
-func VerifyEcc(message string, signature string) bool {
-	api_key, _ := hex.DecodeString(API_KEY)
+func VerifyEcc(body string, signature string, timestamp string, cobokey string) bool {
+	api_key, _ := hex.DecodeString(cobokey)
 	pubKey, _ := btcec.ParsePubKey(api_key, btcec.S256())
 
 	sigBytes, _ := hex.DecodeString(signature)
 	sigObj, _ := btcec.ParseSignature(sigBytes, btcec.S256())
 
-	verified := sigObj.Verify([]byte(Hash256x2(message)), pubKey)
+	verified := sigObj.Verify([]byte(Hash256x2(body+"|"+timestamp)), pubKey)
 	return verified
 }
 
@@ -123,6 +128,10 @@ func Request(method string, path string, params map[string]string) string {
 	}()
 
 	body, _ := ioutil.ReadAll(resp.Body)
+
+	a := VerifyEcc(string(body), resp.Header.Get("Biz_resp_signature"), resp.Header.Get("Biz-Timestamp"), "032f45930f652d72e0c90f71869dfe9af7d713b1f67dc2f7cb51f9572778b9c876")
+	fmt.Println(a)
+
 	return string(body)
 }
 
@@ -132,23 +141,37 @@ func main() {
 	get.address = "0xced5c00ccf7ff9784e11f15206c6b841fe528ad5"
 	get.side = "deposit"
 
+	var post CoinBase
+	post.coin = "TETH"
+
 	//GenerateRandomKeyPair()
 
 	//fmt.Println(get.accountDetails())
 
 	//fmt.Println(get.coinDetails())
 
-	//res := post.newDepositAddress()
+	/*res := post.newDepositAddress()
+	fmt.Println("New address: ", res)
+	var newAddress NewAddress
+	err := json.Unmarshal([]byte(res), &newAddress)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(newAddress.Success)
+	fmt.Println(newAddress.Result.Coin)
+	fmt.Println(newAddress.Result.Address)*/
 
 	//fmt.Println(get.verifyDeopsitAddress())
 
-	//fmt.Println(get.verifyValidAddress())
+	fmt.Println(get.verifyValidAddress())
 
 	//fmt.Println(get.addressHistList())
 
 	//fmt.Println(get.loopAddressDetails())
 
 	//fmt.Println(get.transHistory())
+	//get.transHistory()
+	//fmt.Println(VerifyEcc(resp, "032f45930f652d72e0c90f71869dfe9af7d713b1f67dc2f7cb51f9572778b9c876"))
 
 	//fmt.Println(get.pendingTransaction())
 
@@ -156,10 +179,12 @@ func main() {
 
 	//fmt.Println(get.withdrawalInformation("123"))
 
-	res := Request("GET", "/v1/custody/transaction_history/", map[string]string{
+	//fmt.Println(get.transDetails("20200115204400000323373000007145"))
+
+	/*res := Request("GET", "/v1/custody/transaction_history/", map[string]string{
 		"coin": "TETH",
 		"side": "deposit",
-		"begin_time": "1579091977070",
+		"begin_time": "0",
 	})
 	fmt.Printf("res: %v", res)
 
@@ -174,9 +199,11 @@ func main() {
 		fmt.Println("Number: ", i)
 		fmt.Println("Address: ", topUp.Result[i].Address)
 		fmt.Println("Source Addr: ", topUp.Result[i].Source_address)
+		fmt.Println("Begin Time: ", topUp.Result[i].Created_time)
+		fmt.Println("AbsCoboFee: ", topUp.Result[i].Abs_cobo_fee)
 	}
 
-	fmt.Println("Results: ", len(topUp.Result))
+	fmt.Println("Results: ", len(topUp.Result))*/
 
 
 	//fmt.Println("Results: ", topUp.Result[0].Created_time)
@@ -188,4 +215,18 @@ func main() {
 	fmt.Printf("res: %v", res)*/
 
 	//GenerateRandomKeyPair()
+
+
+	res := post.submitWithdrawal("0xa1398b50E62Bf5512dd659198f1e225db7A8a41b","2500000000000000", "test9", time.Now().String())
+	fmt.Println(res)
+	var withdrawResult WithdrawResult
+	err := json.Unmarshal([]byte(res), &withdrawResult)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(withdrawResult.Success)
+	fmt.Println(withdrawResult.ErrorCode)
+	fmt.Println(withdrawResult.ErrorMessage)
+
+
 }

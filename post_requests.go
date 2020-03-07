@@ -8,10 +8,10 @@ func (p *CoinBase)newDepositAddress() string {
 	return res
 }
 
-func (p *CoinBase)submitWithdrawal(amount, reqId, memo string) string {
+func (p *CoinBase)submitWithdrawal(address, amount, reqId, memo string) string {
 	return Request("POST", "/v1/custody/new_withdraw_request/", map[string]string{
 		"coin": p.coin,
-		"address": p.address,
+		"address": address,
 		"amount": amount,
 		"request_id": reqId,
 		"memo": memo,

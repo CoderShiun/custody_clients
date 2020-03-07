@@ -49,8 +49,10 @@ func (g *CoinBase) loopAddressDetails() string {
 	})
 }
 
-func (g *CoinBase) transDetails() {
-	return
+func (g *CoinBase) transDetails(id string) string {
+	return Request("GET", "/v1/custody/transaction/", map[string]string{
+		"id": id,
+	})
 }
 
 func (g *CoinBase) transHistory() string {
